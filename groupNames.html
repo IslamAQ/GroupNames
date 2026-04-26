@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Members Directory</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            font-size: 1em;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-toggle {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-toggle.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .search-box {
+            max-width: 500px;
+            margin: 0 auto 30px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .search-box button {
+            padding: 12px 25px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .search-box button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .groups-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .group-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .group-card.hidden {
+            display: none;
+        }
+
+        .group-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+        }
+
+        .group-card h2 {
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .group-1 h2 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .group-2 h2 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .group-3 h2 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .members-list {
+            list-style: none;
+        }
+
+        .member-item {
+            padding: 12px;
+            margin: 8px 0;
+            background: #f8f9fa;
+            border-left: 4px solid;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .group-1 .member-item {
+            border-left-color: #667eea;
+        }
+
+        .group-1 .member-item:hover {
+            background: #e8ecff;
+            transform: translateX(5px);
+        }
+
+        .group-2 .member-item {
+            border-left-color: #f5576c;
+        }
+
+        .group-2 .member-item:hover {
+            background: #ffe8ec;
+            transform: translateX(5px);
+        }
+
+        .group-3 .member-item {
+            border-left-color: #00f2fe;
+        }
+
+        .group-3 .member-item:hover {
+            background: #e0f7ff;
+            transform: translateX(5px);
+        }
+
+        .member-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stats {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats p {
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+
+        .highlight {
+            background: yellow;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .cpp-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .cpp-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+
+        .code-display {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            border: 2px solid #667eea;
+            line-height: 1.6;
+        }
+
+        .code-line {
+            margin: 5px 0;
+        }
+
+        .keyword {
+            color: #569cd6;
+            font-weight: bold;
+        }
+
+        .string {
+            color: #ce9178;
+        }
+
+        .function {
+            color: #dcdcaa;
+        }
+
+        .output-section {
+            margin-top: 20px;
+        }
+
+        .run-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        .run-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .run-btn:active {
+            transform: scale(0.98);
+        }
+
+        .output-display {
+            background: #f0f0f0;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: #333;
+            font-weight: 500;
+            animation: fadeInScale 0.5s ease;
+        }
+
+        .output-display.hidden {
+            display: none;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes typewriter {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+
+        .message-typed {
+            overflow: hidden;
+            border-right: 3px solid #667eea;
+            white-space: nowrap;
+            animation: typewriter 1.5s steps(30, end);
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .groups-container {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .code-line {
+                white-space: nowrap;
+            }
+
+            .code-display {
+                font-size: 0.85em;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📋 Programming II - Group Members</h1>
+            <p>Monday Practical Session</p>
+        </header>
+
+        <div class="controls">
+            <button class="btn btn-toggle active" onclick="toggleGroup(1)">Show Group 1</button>
+            <button class="btn btn-toggle active" onclick="toggleGroup(2)">Show Group 2</button>
+            <button class="btn btn-toggle active" onclick="toggleGroup(3)">Show Group 3</button>
+            <button class="btn btn-toggle" onclick="toggleAllGroups()">Toggle All</button>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search your name..." onkeyup="searchMembers()">
+            <button onclick="clearSearch()">Clear</button>
+        </div>
+
+        <div class="groups-container" id="groupsContainer"></div>
+
+        <div class="stats">
+            <p>Total Members: <strong id="totalCount">0</strong></p>
+            <p id="groupStats"></p>
+        </div>
+
+        <div class="cpp-section">
+            <h3>💻</h3>
+            <div class="code-display">
+                <div class="code-line"><span class="keyword">#include</span> &lt;iostream&gt;</div>
+                <div class="code-line"><span class="keyword">using namespace</span> std;</div>
+                <div class="code-line"></div>
+                <div class="code-line"><span class="keyword">int</span> <span class="function">main</span>() {</div>
+                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="function">cout</span> &lt;&lt; <span class="string">"Wishing you all the best :)"</span> &lt;&lt; endl;</div>
+                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> 0;</div>
+                <div class="code-line">}</div>
+            </div>
+            <button class="run-btn" onclick="runCppCode()">▶ Run Code</button>
+            <div class="output-section">
+                <div id="outputDisplay" class="output-display hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const groupsData = {
+            1: {
+                name: 'Group 1',
+                members: [
+                    'DABEEN KHALES SALIH',
+                    'HANAR HAZHAR MAGHDED',
+                    'KANI KARWAN SERWAN OMER',
+                    'KHANDA KHALIL JAMIL',
+                    'LAVA KARWAN JALAL',
+                    'LAVA SARDAR FAROOQ',
+                    'LAWAND MUHAMMED BAKR WSU',
+                    'MALIK NAWZAD HASSAN',
+                    'MOHAMMED ALAA MOTEA YOUSEF',
+                    'MUHAMMED SALAR MAHMOOD MUHAMMED',
+                    'MUSTAFA MOHAMMED ABDULSATTAR',
+                    'RAWA ANWER MOHAMMED AMIN',
+                    'SARA SALAR OTHMAN',
+                    'SIVER ABDULKARIM KHORSHEED',
+                    'SOMA WRYA KAREEM',
+                    'SUHAYB RAMADHAN MOHAMMED',
+                    'YARA ALI HADI KHORSHEED'
+                ]
+            },
+            2: {
+                name: 'Group 2',
+                members: [
+                    'AHMED OMAR OMAR',
+                    'AVA KAMARAN HAJI',
+                    'BAWAR NABAZ HAWEZ',
+                    'BIRHAT MSHEER FARIS',
+                    'DANAR MIQDAD ABDULRAHMAN ISMAIL',
+                    'FRESHTA ADNAN SALEH',
+                    'HAVAL SORAN TAHAA',
+                    'ISMAIL FRYAD SMAIL ABUBAKER',
+                    'LARA HUSSEIN ABDULLAH',
+                    'MARDIN SANGER OMER SULIMAN',
+                    'NADIN WISAM MUSTAFA SAM',
+                    'NURSI NABIL ADL',
+                    'RAYAN SIRWAN AZEEZ',
+                    'ROVA YOUSEF NORALDEEN ESMAIL',
+                    'SHAD SHAIDA SALAH',
+                    'SHAHYAN OTHMAN ALI',
+                    'SOLIN QANE HAJI MUSTAFA'
+                ]
+            },
+            3: {
+                name: 'Group 3',
+                members: [
+                    'AYAD EMAD MUSHIR',
+                    'DANYA REKAWT NASIH',
+                    'DARYAN PISHTIWAN SABIR ISMAIL',
+                    'HAMZA MOAFAQ RASHED',
+                    'HARDI MOUAYAD JAWHER SHAREEF',
+                    'HELIN MUSTAFA SALEH YOUNIS',
+                    'HEVEN HAWRE SAED QADER',
+                    'LARA YASHAR JAMAL MAWED',
+                    'LAJAN ABDULWAHID MASOUD',
+                    'LIZAN RASOOL TOFEQ TAHA',
+                    'MIRAN KARWAN JALAL',
+                    'MOHAMMED BILAL JAMEL ALI',
+                    'MOHAMMED NADHEM KHALIL',
+                    'NIYAN PISHTIWAN SABIR ISMAIL',
+                    'SHAMER AMIR AZIZ',
+                    'SOMA BARZAN ABDULAZIZ',
+                    'SOZ AYOUB ANWER'
+                ]
+            }
+        };
+
+        let visibleGroups = {1: true, 2: true, 3: true};
+
+        function renderGroups() {
+            const container = document.getElementById('groupsContainer');
+            container.innerHTML = '';
+
+            let totalMembers = 0;
+            let html = '';
+
+            [1, 2, 3].forEach(groupNum => {
+                if (visibleGroups[groupNum]) {
+                    const group = groupsData[groupNum];
+                    const members = group.members;
+                    totalMembers += members.length;
+
+                    html += `
+                        <div class="group-card group-${groupNum}" id="group-${groupNum}">
+                            <h2>${group.name} (${members.length})</h2>
+                            <ul class="members-list">
+                                ${members.map(member => `<li class="member-item">${member}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html;
+            updateStats();
+        }
+
+        function toggleGroup(groupNum) {
+            visibleGroups[groupNum] = !visibleGroups[groupNum];
+            const btn = document.querySelectorAll('.btn-toggle')[groupNum - 1];
+            btn.classList.toggle('active');
+            renderGroups();
+        }
+
+        function toggleAllGroups() {
+            const allVisible = Object.values(visibleGroups).every(v => v);
+            [1, 2, 3].forEach(i => visibleGroups[i] = !allVisible);
+            document.querySelectorAll('.btn-toggle:not(:last-child)').forEach(btn => {
+                btn.classList.toggle('active');
+            });
+            renderGroups();
+        }
+
+        function searchMembers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.group-card');
+
+            cards.forEach(card => {
+                const members = card.querySelectorAll('.member-item');
+                let visibleCount = 0;
+
+                members.forEach(member => {
+                    const name = member.textContent.toLowerCase();
+                    if (name.includes(searchTerm)) {
+                        member.style.display = 'block';
+                        visibleCount++;
+                    } else {
+                        member.style.display = 'none';
+                    }
+                });
+
+                if (visibleCount === 0 && searchTerm) {
+                    card.style.opacity = '0.5';
+                } else {
+                    card.style.opacity = '1';
+                }
+            });
+
+            updateStats();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            searchMembers();
+        }
+
+        function updateStats() {
+            let total = 0;
+            let group1Count = 0, group2Count = 0, group3Count = 0;
+
+            [1, 2, 3].forEach(groupNum => {
+                const card = document.getElementById(`group-${groupNum}`);
+                if (card) {
+                    const visibleMembers = card.querySelectorAll('.member-item:not([style*="display: none"])');
+                    const count = visibleMembers.length;
+                    total += count;
+                    if (groupNum === 1) group1Count = count;
+                    if (groupNum === 2) group2Count = count;
+                    if (groupNum === 3) group3Count = count;
+                }
+            });
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('groupStats').textContent = 
+                `Group 1: ${group1Count} | Group 2: ${group2Count} | Group 3: ${group3Count}`;
+        }
+
+        // Initial render
+        renderGroups();
+
+        function runCppCode() {
+            const outputDisplay = document.getElementById('outputDisplay');
+            outputDisplay.classList.remove('hidden');
+            outputDisplay.classList.remove('message-typed');
+            outputDisplay.textContent = '';
+
+            // Simulate code execution with delay
+            setTimeout(() => {
+                const message = 'Wishing you all the best :)';
+                outputDisplay.classList.add('message-typed');
+                outputDisplay.textContent = message;
+            }, 100);
+        }
+    </script>
+</body>
+</html>
